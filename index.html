@@ -71,6 +71,16 @@
   .tag{display:inline-block;font-size:10.5px;font-weight:700;color:var(--accent);
     text-transform:uppercase;letter-spacing:.04em;margin-right:6px;}
 
+  .example-toggle{display:inline-block;margin:4px 0 0;font-size:11.5px;color:var(--accent);
+    background:none;border:none;cursor:pointer;padding:0;font-weight:600;text-decoration:underline;
+    text-underline-offset:2px;}
+  .example-box{display:none;margin:7px 0 2px;padding:10px 12px;background:var(--card2);
+    border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;
+    font-size:12.5px;line-height:1.55;color:var(--text);}
+  .example-box.open{display:block;}
+  .example-box .ex-title{font-weight:700;color:var(--accent2);margin-bottom:4px;display:block;
+    font-size:11px;text-transform:uppercase;letter-spacing:.03em;}
+
   .notion-cta{display:flex;align-items:center;justify-content:space-between;gap:10px;
     background:#0003;border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-top:12px;}
   .notion-cta span{font-size:12.5px;color:var(--muted);}
@@ -981,6 +991,47 @@ const DAYS = [
 ];
 const DATABASE_URL = "https://app.notion.com/p/0588af861a594e15af5c4f1fbbeda3ef";
 
+const EXAMPLES = [
+  { match:/hanon\s*n[ºo°]?\s*1\b/i, title:"Hanon nº1 (patrón adaptado)", html:
+    "Mano derecha: <b>Do-Re-Mi-Fa-Sol-Fa-Mi-Re-Do</b> (dedos 1-2-3-4-5-4-3-2-1). Repite subiendo un grado cada vez: Re-Mi-Fa-Sol-La-Sol-Fa-Mi-Re, luego Mi-Fa-Sol-La-Si-La-Sol-Fa-Mi, y así hasta la octava. Metrónomo a ♩=60, notas parejas, muñeca suelta." },
+  { match:/hanon\s*n[ºo°]?\s*2\b/i, title:"Hanon nº2 (patrón adaptado)", html:
+    "Mismo movimiento que el nº1 pero empezando un grado más arriba: <b>Re-Mi-Fa-Sol-La-Sol-Fa-Mi-Re</b> (dedos 1-2-3-4-5-4-3-2-1). Cuida que el dedo 4 no suene más flojo que los demás — es el que más cuesta independizar." },
+  { match:/hanon\s*n[ºo°]?\s*3\b/i, title:"Hanon nº3 (patrón adaptado)", html:
+    "Patrón con salto de tercera: <b>Do-Mi-Re-Fa-Mi-Sol-Fa-La</b> (dedos 1-3-2-4-3-5-4...). Practícalo muy lento, escuchando que las dos notas de cada salto suenen con el mismo volumen." },
+  { match:/hanon\s*n[ºo°]?\s*4\b/i, title:"Hanon nº4 (patrón adaptado)", html:
+    "Patrón con nota repetida: <b>Do-Do-Re-Re-Mi-Mi-Fa-Fa</b> (dedos 1-1-2-2-3-3-4-4), cambiando de dedo en la misma tecla sin mover la mano. Sirve para ganar precisión y control." },
+  { match:/hanon\s*n[ºo°]?\s*5\b/i, title:"Hanon nº5 (patrón adaptado)", html:
+    "Combinación de grados y salto: <b>Do-Re-Mi-Fa-Sol-La-Sol-Fa</b> (dedos 1-2-3-4-5-4-3-2). Enfócate en llegar arriba con el dedo 5 sin tensar la muñeca, y bajar controlado." },
+  { match:/escala de do mayor/i, title:"Escala de Do mayor", html:
+    "Notas: <b>Do-Re-Mi-Fa-Sol-La-Si-Do</b>. Mano derecha subiendo: dedos 1-2-3-1-2-3-4-5. Mano izquierda subiendo: dedos 5-4-3-2-1-3-2-1. Lo más difícil es el paso del pulgar por debajo de la mano (Mi→Fa en la derecha) — practica solo ese cruce, muy lento, antes de tocar la escala completa." },
+  { match:/escala de sol mayor|sol\s*m\b/i, title:"Escala de Sol mayor", html:
+    "Notas: <b>Sol-La-Si-Do-Re-Mi-Fa#-Sol</b> (el Fa se toca sostenido, la tecla negra). La digitación es igual que en Do mayor: mano derecha 1-2-3-1-2-3-4-5, mano izquierda 5-4-3-2-1-3-2-1." },
+  { match:/negra\s*\+\s*corchea|ritmo.*combinad/i, title:"Ritmo: negra + corchea combinadas", html:
+    "Primero ubica dónde cae cada negra contando '1-2-3-4' en voz alta. Luego intercala las corcheas justo en los 'y' ('1-y-2-y-3-y-4-y'). Marca el pulso con el pie o el metrónomo y no aceleres en las corcheas — deben durar exactamente la mitad que la negra." },
+  { match:/ritmo con negras/i, title:"Ritmo con negras", html:
+    "La negra (♩) dura 1 tiempo. Cuenta en voz alta '1-2-3-4' y toca una nota en cada número, siguiendo el metrónomo. Antes de tocarlo en el piano, practícalo solo con palmadas." },
+  { match:/ritmo con corcheas/i, title:"Ritmo con corcheas", html:
+    "La corchea (♪) dura medio tiempo — van de a dos por cada negra. Cuenta '1-y-2-y-3-y-4-y', tocando una nota en cada número y otra en cada 'y'. Empieza contando en voz alta antes de tocar." },
+  { match:/clave de sol/i, title:"Clave de Sol — notas en el pentagrama", html:
+    "De abajo hacia arriba, las líneas son: <b>Mi-Sol-Si-Re-Fa</b>. El Do central va en una línea adicional justo debajo del pentagrama. Inventa una frase con esas iniciales para memorizarlo más rápido." },
+  { match:/clave de fa/i, title:"Clave de Fa — notas en el pentagrama", html:
+    "De abajo hacia arriba, las líneas son: <b>Sol-Si-Re-Fa-La</b>. El Do central va en una línea adicional justo arriba del pentagrama (mano izquierda)." },
+  { match:/m[ée]todo 3d/i, title:"Método 3D: Detecta, Delimita, Diseña", html:
+    "1) <b>Detecta</b> el grupo exacto de 2-4 notas que te cuesta, no 'toda la pieza'. 2) <b>Delimita</b>: aísla solo ese fragmento. 3) <b>Diseña</b> una solución: repítelo muy lento 5 veces seguidas sin error, pruébalo con un ritmo distinto (por ejemplo con puntillo), y recién ahí sube la velocidad de a poco." },
+  { match:/lectura simult[aá]nea|primera vista/i, title:"Cómo leer un fragmento nuevo", html:
+    "Antes de tocar: mira el fragmento completo y ubica en silencio la nota más aguda y la más grave. Luego toca solo el ritmo (todas las notas iguales) contando en voz alta. Recién ahí junta notas + ritmo, muy lento, sin detenerte aunque te equivoques — leer a primera vista es no parar." },
+  { match:/mikrokosmos/i, title:"Cómo abordar un Mikrokosmos (Bartók)", html:
+    "Antes de tocar, canta o tararea la melodía mirando la partitura para tener el sonido en el oído. Toca manos separadas muy lento, marcando mentalmente los tiempos fuertes del compás, y junta las manos solo cuando cada una salga sola sin dudar." },
+  { match:/minuet en sol mayor/i, title:"Cómo trabajar el Minuet en Sol mayor", html:
+    "Divide la pieza en frases cortas (unos 4 compases) en vez de intentar tocarla entera. Trabaja cada frase manos separadas hasta que salga fluida, y solo entonces júntala. Siente el pulso en 3 tiempos por compás, sin apurar los finales de frase." },
+  { match:/let it be|canci[oó]n de rock/i, title:"\"Let It Be\" — acordes básicos", html:
+    "Acordes en posición básica: <b>Do</b> (Do-Mi-Sol), <b>Sol</b> (Sol-Si-Re), <b>La menor</b> (La-Do-Mi), <b>Fa</b> (Fa-La-Do). Practica solo los cambios entre acordes con la mano izquierda, sin ritmo, hasta que la mano 'sepa' la forma de memoria antes de agregarle el pulso." }
+];
+function findExample(text){
+  for(const ex of EXAMPLES){ if(ex.match.test(text)) return ex; }
+  return null;
+}
+
 function todayStr(){
   const n = new Date();
   return n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0");
@@ -1029,13 +1080,27 @@ function renderTasks(day, container){
     const checked = !!checkState[id];
     const row = document.createElement("div");
     row.className = "task" + (checked ? " checked" : "");
+    const ex = findExample(t[1]);
+    const exId = id + "_ex";
     row.innerHTML = `<input type="checkbox" id="${id}" ${checked?"checked":""}>
-      <label for="${id}"><span class="tag">${t[0]}</span>${t[1]}</label>`;
+      <div style="flex:1 1 auto;">
+        <label for="${id}"><span class="tag">${t[0]}</span>${t[1]}</label>
+        ${ex ? `<button type="button" class="example-toggle" data-target="${exId}">💡 Ver ejemplo</button>
+        <div class="example-box" id="${exId}"><span class="ex-title">${ex.title}</span>${ex.html}</div>` : ""}
+      </div>`;
     row.querySelector("input").addEventListener("change", (e)=>{
       checkState[id] = e.target.checked;
       row.classList.toggle("checked", e.target.checked);
       updateProgress(day, container.dataset.progressTarget);
     });
+    if(ex){
+      const btn = row.querySelector(".example-toggle");
+      const box = row.querySelector("#"+CSS.escape(exId));
+      btn.addEventListener("click", ()=>{
+        const isOpen = box.classList.toggle("open");
+        btn.textContent = isOpen ? "▲ Ocultar ejemplo" : "💡 Ver ejemplo";
+      });
+    }
     container.appendChild(row);
   });
 }
