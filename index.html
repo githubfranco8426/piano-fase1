@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Piano — Fase 1</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --card:#171a21;
+    --card2:#1e222b;
+    --text:#eef0f4;
+    --muted:#9aa2b1;
+    --accent:#5b8cff;
+    --accent2:#7fd8a0;
+    --rest:#6b7280;
+    --today-ring:#ffcc66;
+    --border:#262b36;
+    --notion:#eef0f4;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-tap-highlight-color:transparent;}
+  body{padding-bottom:60px;}
+  header{padding:22px 18px 14px;position:sticky;top:0;background:linear-gradient(180deg,var(--bg) 80%,transparent);z-index:5;}
+  header h1{margin:0 0 4px;font-size:22px;letter-spacing:.2px;}
+  header p{margin:0;color:var(--muted);font-size:13.5px;}
+  .wrap{padding:0 14px;max-width:640px;margin:0 auto;}
+
+  .today-card{background:linear-gradient(145deg,var(--card2),var(--card));
+    border:1px solid var(--border);border-radius:18px;padding:16px 16px 14px;margin:14px 0 18px;
+    box-shadow:0 6px 24px rgba(0,0,0,.25);}
+  .today-card .badge{display:inline-block;background:var(--accent);color:#0b0e14;font-weight:700;
+    font-size:11.5px;padding:3px 9px;border-radius:100px;margin-bottom:8px;}
+  .today-card .badge.rest{background:var(--rest);color:#fff;}
+  .today-card h2{margin:0 0 2px;font-size:19px;}
+  .today-card .sub{color:var(--muted);font-size:13px;margin-bottom:10px;}
+  .progress-bar{height:6px;background:#0006;border-radius:100px;overflow:hidden;margin:10px 0 4px;}
+  .progress-bar > div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width .25s;}
+  .progress-label{font-size:11.5px;color:var(--muted);text-align:right;}
+
+  .section-title{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+    margin:22px 2px 8px;font-weight:700;}
+
+  .week{margin-bottom:14px;}
+  .week-head{display:flex;justify-content:space-between;align-items:baseline;padding:0 2px 6px;}
+  .week-head .name{font-weight:700;font-size:14px;}
+  .week-head .range{font-size:11.5px;color:var(--muted);}
+  .days-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .day-btn{background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:8px 2px 7px;text-align:center;cursor:pointer;position:relative;}
+  .day-btn .dow{display:block;font-size:9.5px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;}
+  .day-btn .num{display:block;font-size:15px;font-weight:700;}
+  .day-btn .dot{display:block;width:5px;height:5px;border-radius:50%;margin:4px auto 0;background:var(--accent);}
+  .day-btn.rest .dot{background:var(--rest);}
+  .day-btn.past{opacity:.55;}
+  .day-btn.selected{border-color:var(--accent);background:#5b8cff22;}
+  .day-btn.today{box-shadow:0 0 0 2px var(--today-ring);}
+
+  .detail{background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:16px;margin-top:14px;display:none;}
+  .detail.open{display:block;}
+  .detail .dtitle{font-size:16px;font-weight:700;margin-bottom:2px;}
+  .detail .dsub{font-size:12.5px;color:var(--muted);margin-bottom:12px;}
+  .task{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-top:1px solid var(--border);}
+  .task:first-of-type{border-top:none;}
+  .task input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent);flex:0 0 auto;}
+  .task label{font-size:14px;line-height:1.4;}
+  .task.checked label{color:var(--muted);text-decoration:line-through;}
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;color:var(--accent);
+    text-transform:uppercase;letter-spacing:.04em;margin-right:6px;}
+
+  .notion-cta{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:#0003;border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-top:12px;}
+  .notion-cta span{font-size:12.5px;color:var(--muted);}
+  .notion-cta a{flex:0 0 auto;background:var(--notion);color:#0b0e14;font-weight:700;
+    text-decoration:none;padding:8px 13px;border-radius:100px;font-size:12.5px;white-space:nowrap;}
+
+  .notion-box{background:var(--card2);border:1px dashed var(--border);border-radius:14px;
+    padding:13px 14px;margin:20px 0;font-size:13px;color:var(--muted);line-height:1.5;}
+  .notion-box a.btn{display:inline-block;margin-top:9px;background:var(--accent);color:#0b0e14;
+    font-weight:700;text-decoration:none;padding:9px 14px;border-radius:100px;font-size:13px;}
+
+  footer{text-align:center;color:var(--muted);font-size:11.5px;padding:20px 14px 6px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>🎹 Piano — Fase 1</h1>
+    <p>17 ago – 27 sep 2026 · 30–60 min diarios · Fundamentos</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="today-card" id="todayCard"></div>
+
+  <div class="notion-box">
+    Marca aquí mientras practicas, como guía visual del día. Para que el check quede guardado de verdad y lo veas
+    mañana desde el celular, tócalo también en tu página de Notion (botón "Marcar en Notion ✓" de cada día, o el
+    acceso general de abajo).
+    <br>
+    <a class="btn" href="https://app.notion.com/p/0588af861a594e15af5c4f1fbbeda3ef" target="_blank" rel="noopener">Abrir base completa en Notion →</a>
+  </div>
+
+  <div class="section-title">Calendario — Fase 1</div>
+  <div id="calendar"></div>
+
+  <div class="detail" id="detail"></div>
+
+  <footer>Fase 1 · Franco · generado a partir de tu notebook de piano</footer>
+</div>
+
+<script>
+const DAYS = [
+{
+"d": "2026-08-17",
+"dow": "Lun",
+"wk": 1,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Postura frente al piano (banco, muñecas) + escala de Do mayor, mano derecha, lento"
+],
+[
+"Teoría",
+"Clave de Sol: identificar Do-Re-Mi"
+],
+[
+"Repertorio",
+"Mikrokosmos nº1: leer y tocar solo con mano derecha"
+],
+[
+"Cierre",
+"Repasa y anota 2-3 líneas en tu bitácora"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181a3a0aecaf808d1db8b"
+},
+{
+"d": "2026-08-18",
+"dow": "Mar",
+"wk": 1,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Escala de Do mayor, mano izquierda sola + Hanon nº1 (mano derecha), muy lento"
+],
+[
+"Teoría",
+"Clave de Sol: sumar Fa-Sol"
+],
+[
+"Repertorio",
+"Mikrokosmos nº1: mano izquierda sola"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181628da1ee1da9fb82d0"
+},
+{
+"d": "2026-08-19",
+"dow": "Mié",
+"wk": 1,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº1, manos separadas (primero derecha, luego izquierda)"
+],
+[
+"Teoría",
+"Repasar clave de Sol completa (Do a Sol)"
+],
+[
+"Repertorio",
+"Mikrokosmos nº1: manos juntas, muy lento"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181c5a7cdd136290391a2"
+},
+{
+"d": "2026-08-20",
+"dow": "Jue",
+"wk": 1,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Escala de Do mayor, manos juntas + repaso Hanon nº1"
+],
+[
+"Repertorio",
+"Mikrokosmos nº2: leer y tocar mano derecha"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181039333e38438922fe3"
+},
+{
+"d": "2026-08-21",
+"dow": "Vie",
+"wk": 1,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº1, un poco más fluido"
+],
+[
+"Repertorio",
+"Mikrokosmos nº2: manos separadas"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a3818103bfe1c9479fe001cd"
+},
+{
+"d": "2026-08-22",
+"dow": "Sáb",
+"wk": 1,
+"t": "A",
+"tasks": [
+[
+"Repaso",
+"Escala de Do mayor ambas manos + Hanon nº1"
+],
+[
+"Repertorio",
+"Mikrokosmos nº1 y nº2 completas"
+],
+[
+"Cierre",
+"Grábate tocando 1 minuto (referencia para comparar más adelante)"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a381819494d5c24499ab1008"
+},
+{
+"d": "2026-08-23",
+"dow": "Dom",
+"wk": 1,
+"t": "D",
+"tasks": [
+[
+"Descanso",
+"Hoy no hay ejercicios técnicos"
+],
+[
+"Opcional",
+"Repasar de oído lo tocado esta semana, 10 min, sin exigencia"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181f49cbadcf05d85b1e4"
+},
+{
+"d": "2026-08-24",
+"dow": "Lun",
+"wk": 2,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº1, manos juntas, lento"
+],
+[
+"Teoría",
+"Clave de Sol: ritmo con negras"
+],
+[
+"Repertorio",
+"Mikrokosmos nº1: intentar de memoria, mano derecha"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a381816b85aefcb04e225a7a"
+},
+{
+"d": "2026-08-25",
+"dow": "Mar",
+"wk": 2,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº2 (nuevo), manos separadas"
+],
+[
+"Teoría",
+"Clave de Sol: ritmo con corcheas"
+],
+[
+"Repertorio",
+"Mikrokosmos nº1: de memoria, ambas manos"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181ceaf54c17031e9f14e"
+},
+{
+"d": "2026-08-26",
+"dow": "Mié",
+"wk": 2,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº1 y nº2, manos separadas"
+],
+[
+"Repertorio",
+"Mikrokosmos nº2: de memoria, mano derecha"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a381818c8754c0c1387852e0"
+},
+{
+"d": "2026-08-27",
+"dow": "Jue",
+"wk": 2,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº2, manos juntas, lento"
+],
+[
+"Teoría",
+"Repaso de ritmo: negra + corchea combinadas"
+],
+[
+"Repertorio",
+"Mikrokosmos nº2: de memoria, ambas manos"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a381818da53efdc6591ac4aa"
+},
+{
+"d": "2026-08-28",
+"dow": "Vie",
+"wk": 2,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº1 y nº2 seguidos"
+],
+[
+"Repertorio",
+"Mikrokosmos nº1 y nº2 seguidas, de memoria"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181a8918acb8ca22ed057"
+},
+{
+"d": "2026-08-29",
+"dow": "Sáb",
+"wk": 2,
+"t": "A",
+"tasks": [
+[
+"Repaso",
+"Toda la semana: Hanon nº1-2, Mikrokosmos nº1-2"
+],
+[
+"Cierre",
+"Grábate tocando Mikrokosmos nº1 y nº2 de memoria y compara con la grabación pasada"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181d4b065fbef732c0056"
+},
+{
+"d": "2026-08-30",
+"dow": "Dom",
+"wk": 2,
+"t": "D",
+"tasks": [
+[
+"Descanso",
+"Hoy no hay ejercicios técnicos"
+],
+[
+"Opcional",
+"Repaso liviano, 10 min, sin exigencia"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181b7b3e1f578c3d584ec"
+},
+{
+"d": "2026-08-31",
+"dow": "Lun",
+"wk": 3,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº2 repaso + Hanon nº3 (nuevo), manos separadas"
+],
+[
+"Teoría",
+"Clave de Fa: identificar Do-Re-Mi grave"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181a6b6bad84c62213cc3"
+},
+{
+"d": "2026-09-01",
+"dow": "Mar",
+"wk": 3,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Escala de Sol mayor, manos separadas"
+],
+[
+"Teoría",
+"Clave de Fa: sumar Fa-Sol grave"
+],
+[
+"Repertorio",
+"Mikrokosmos nº5: leer mano derecha"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a381810d89c5cd3b115cbd42"
+},
+{
+"d": "2026-09-02",
+"dow": "Mié",
+"wk": 3,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº3, manos juntas, lento"
+],
+[
+"Repertorio",
+"Mikrokosmos nº5 manos separadas + Mikrokosmos nº6 leer mano derecha"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a381818bad12cab9cfec5f1d"
+},
+{
+"d": "2026-09-03",
+"dow": "Jue",
+"wk": 3,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Escala de Sol mayor, manos juntas"
+],
+[
+"Repertorio",
+"Mikrokosmos nº6 manos separadas"
+],
+[
+"Nuevo",
+"Empezar a leer (sin tocar) el Minuet en Sol mayor, BWV Anh. 114 (Álbum de Ana Magdalena, Bach)"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181379b1cc954edafcbde"
+},
+{
+"d": "2026-09-04",
+"dow": "Vie",
+"wk": 3,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº2 y nº3 seguidos"
+],
+[
+"Repertorio",
+"Mikrokosmos nº5 y nº6, manos juntas, muy lento"
+],
+[
+"Repertorio",
+"Minuet en Sol mayor (Bach): mano derecha sola"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a381818eba06f0507553c39a"
+},
+{
+"d": "2026-09-05",
+"dow": "Sáb",
+"wk": 3,
+"t": "A",
+"tasks": [
+[
+"Repaso",
+"Escala Sol M, Hanon nº2-3, Mikrokosmos nº5-6, Minuet en Sol mayor (mano derecha)"
+],
+[
+"Cierre",
+"Grábate tocando lo repasado"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181c48206e1b1e1a7dd84"
+},
+{
+"d": "2026-09-06",
+"dow": "Dom",
+"wk": 3,
+"t": "D",
+"tasks": [
+[
+"Descanso",
+"Hoy no hay ejercicios técnicos"
+],
+[
+"Opcional",
+"Repaso liviano, 10 min"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181f18f84d7fd01581a8f"
+},
+{
+"d": "2026-09-07",
+"dow": "Lun",
+"wk": 4,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº3 repaso + Hanon nº4 (nuevo), manos separadas"
+],
+[
+"Teoría",
+"Lectura simultánea: fragmento de 2 compases, muy simple"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181068cf1f2418edb1856"
+},
+{
+"d": "2026-09-08",
+"dow": "Mar",
+"wk": 4,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº4, manos separadas"
+],
+[
+"Repertorio",
+"Minuet en Sol mayor (Bach): mano izquierda sola"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181cb89cdd5a11feb847d"
+},
+{
+"d": "2026-09-09",
+"dow": "Mié",
+"wk": 4,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº3 y nº4 seguidos"
+],
+[
+"Repertorio",
+"Minuet en Sol mayor: manos juntas, muy lento"
+],
+[
+"Teoría",
+"Lectura simultánea: otro fragmento de 2 compases"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a3818193832ad3d085646f50"
+},
+{
+"d": "2026-09-10",
+"dow": "Jue",
+"wk": 4,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº4, manos juntas, lento"
+],
+[
+"Repertorio",
+"Minuet en Sol mayor: tempo normal lento"
+],
+[
+"Método 3D",
+"Detecta, delimita y diseña una solución para el pasaje que más te cueste"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181d1a008ddc7c03642ca"
+},
+{
+"d": "2026-09-11",
+"dow": "Vie",
+"wk": 4,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº4, más fluido"
+],
+[
+"Teoría",
+"Lectura simultánea: fragmento nuevo de 4 compases, a primera vista"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181ff9287d60efc6d6bfa"
+},
+{
+"d": "2026-09-12",
+"dow": "Sáb",
+"wk": 4,
+"t": "A",
+"tasks": [
+[
+"Repaso",
+"Hanon nº4 + Minuet en Sol mayor completo"
+],
+[
+"Teoría",
+"Lectura a primera vista de un fragmento nuevo"
+],
+[
+"Cierre",
+"Grábate tocando el Minuet en Sol mayor"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181a9ab27e1074bb121c5"
+},
+{
+"d": "2026-09-13",
+"dow": "Dom",
+"wk": 4,
+"t": "D",
+"tasks": [
+[
+"Descanso",
+"Hoy no hay ejercicios técnicos"
+],
+[
+"Opcional",
+"Repaso liviano, 10 min"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181d288f6e9f4821b58a3"
+},
+{
+"d": "2026-09-14",
+"dow": "Lun",
+"wk": 5,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº4 repaso + Hanon nº5 (nuevo), manos separadas"
+],
+[
+"Repertorio",
+"\"Let It Be\" (The Beatles): escuchar y identificar los acordes C-G-Am-F, practicar solo los cambios en mano izquierda, muy lento"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a3818192ad33d1fc183d5b2d"
+},
+{
+"d": "2026-09-15",
+"dow": "Mar",
+"wk": 5,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº5, manos separadas"
+],
+[
+"Repertorio",
+"\"Let It Be\": acordes C-G-Am-F en bloque, mano izquierda sola, siguiendo el pulso, muy lento"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a381812a9d86cc4ae6ad1e3b"
+},
+{
+"d": "2026-09-16",
+"dow": "Mié",
+"wk": 5,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº4 y nº5 seguidos"
+],
+[
+"Repertorio",
+"\"Let It Be\": melodía de la primera frase, mano derecha sola"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181259367ea1792904e7d"
+},
+{
+"d": "2026-09-17",
+"dow": "Jue",
+"wk": 5,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Hanon nº5, manos juntas, lento"
+],
+[
+"Repertorio",
+"\"Let It Be\": manos juntas, muy lento, primera estrofa"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181a59c40fc4517cd1ca4"
+},
+{
+"d": "2026-09-18",
+"dow": "Vie",
+"wk": 5,
+"t": "A",
+"tasks": [
+[
+"Teoría",
+"Lectura simultánea más fluida: fragmento de 4-6 compases"
+],
+[
+"Repertorio",
+"\"Let It Be\": primera estrofa a tempo + agregar el coro si alcanzas"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181c9b614fe3ceb873d13"
+},
+{
+"d": "2026-09-19",
+"dow": "Sáb",
+"wk": 5,
+"t": "A",
+"tasks": [
+[
+"Repaso",
+"Hanon nº5 + \"Let It Be\" completa (o lo más avanzada posible)"
+],
+[
+"Cierre",
+"Grábate tocando \"Let It Be\""
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181269e23ec45b40141a6"
+},
+{
+"d": "2026-09-20",
+"dow": "Dom",
+"wk": 5,
+"t": "D",
+"tasks": [
+[
+"Descanso",
+"Hoy no hay ejercicios técnicos"
+],
+[
+"Opcional",
+"Repaso liviano, 10 min"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a3818141aca2f36c53faefd5"
+},
+{
+"d": "2026-09-21",
+"dow": "Lun",
+"wk": 6,
+"t": "A",
+"tasks": [
+[
+"Técnica",
+"Repaso Hanon nº1 a nº5 seguidos, manos juntas, lento a rápido"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181d48336e79ed32cc7a7"
+},
+{
+"d": "2026-09-22",
+"dow": "Mar",
+"wk": 6,
+"t": "A",
+"tasks": [
+[
+"Teoría",
+"Repaso completo: clave de Sol y Fa, figuras rítmicas, lectura simultánea de un fragmento nuevo"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a3818135b524f159d3455674"
+},
+{
+"d": "2026-09-23",
+"dow": "Mié",
+"wk": 6,
+"t": "A",
+"tasks": [
+[
+"Repertorio",
+"Repaso del Minuet en Sol mayor completo, afinando los pasajes que aún cuesten (método 3D)"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a3818136adb2fc1b33f9f676"
+},
+{
+"d": "2026-09-24",
+"dow": "Jue",
+"wk": 6,
+"t": "A",
+"tasks": [
+[
+"Repertorio",
+"Repaso canción de rock completa, afinando acordes y transiciones"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a381817db4f9dbb07bff85bb"
+},
+{
+"d": "2026-09-25",
+"dow": "Vie",
+"wk": 6,
+"t": "A",
+"tasks": [
+[
+"Ensayo general",
+"Hanon + Minuet en Sol mayor + \"Let It Be\", todo seguido, como una mini presentación"
+],
+[
+"Cierre",
+"Bitácora del día"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a381813db61fd6f6089c6279"
+},
+{
+"d": "2026-09-26",
+"dow": "Sáb",
+"wk": 6,
+"t": "A",
+"tasks": [
+[
+"Grabación final",
+"Tócate completo: Minuet en Sol mayor + \"Let It Be\""
+],
+[
+"Comparar",
+"Escucha tu grabación del sábado 22 de agosto y compárala con esta"
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181798842ff9879fc8d26"
+},
+{
+"d": "2026-09-27",
+"dow": "Dom",
+"wk": 6,
+"t": "D",
+"tasks": [
+[
+"Fin de Fase 1",
+"🎉 Descanso. Completaste 6 semanas de fundamentos."
+]
+],
+"url": "https://app.notion.com/p/3bf4ffc0a38181679e2bf453cda8f67a"
+}
+];
+const DATABASE_URL = "https://app.notion.com/p/0588af861a594e15af5c4f1fbbeda3ef";
+
+function todayStr(){
+  const n = new Date();
+  return n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0");
+}
+const TODAY = todayStr();
+const checkState = {}; // guía visual en memoria; el registro real vive en Notion
+
+function fmtRange(days){
+  const first = days[0].d.split("-"), last = days[days.length-1].d.split("-");
+  const meses=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  return `${parseInt(first[2])} al ${parseInt(last[2])} de ${meses[parseInt(last[1])-1]}`;
+}
+
+function renderCalendar(){
+  const cal = document.getElementById("calendar");
+  cal.innerHTML = "";
+  for(let w=1; w<=6; w++){
+    const weekDays = DAYS.filter(x=>x.wk===w);
+    const section = document.createElement("div");
+    section.className = "week";
+    section.innerHTML = `<div class="week-head"><span class="name">Semana ${w}</span><span class="range">${fmtRange(weekDays)}</span></div>`;
+    const row = document.createElement("div");
+    row.className = "days-row";
+    weekDays.forEach(day=>{
+      const btn = document.createElement("div");
+      let cls = "day-btn" + (day.t==="D" ? " rest" : "");
+      if(day.d < TODAY) cls += " past";
+      if(day.d === TODAY) cls += " today";
+      btn.className = cls;
+      btn.dataset.date = day.d;
+      btn.innerHTML = `<span class="dow">${day.dow}</span><span class="num">${parseInt(day.d.split("-")[2])}</span><span class="dot"></span>`;
+      btn.addEventListener("click", ()=>selectDay(day.d));
+      row.appendChild(btn);
+    });
+    section.appendChild(row);
+    cal.appendChild(section);
+  }
+}
+
+function taskId(date, idx){ return date+"_"+idx; }
+
+function renderTasks(day, container){
+  container.innerHTML = "";
+  day.tasks.forEach((t, idx)=>{
+    const id = taskId(day.d, idx);
+    const checked = !!checkState[id];
+    const row = document.createElement("div");
+    row.className = "task" + (checked ? " checked" : "");
+    row.innerHTML = `<input type="checkbox" id="${id}" ${checked?"checked":""}>
+      <label for="${id}"><span class="tag">${t[0]}</span>${t[1]}</label>`;
+    row.querySelector("input").addEventListener("change", (e)=>{
+      checkState[id] = e.target.checked;
+      row.classList.toggle("checked", e.target.checked);
+      updateProgress(day, container.dataset.progressTarget);
+    });
+    container.appendChild(row);
+  });
+}
+
+function updateProgress(day, barId){
+  const total = day.tasks.length;
+  const done = day.tasks.filter((_,idx)=>checkState[taskId(day.d,idx)]).length;
+  const bar = document.getElementById(barId);
+  if(bar){
+    bar.querySelector("div").style.width = (total? (done/total*100):0)+"%";
+    bar.nextElementSibling.textContent = done+"/"+total+" completado (guía visual)";
+  }
+}
+
+function weekdayLong(dow){
+  return {Lun:"Lunes",Mar:"Martes",Mié:"Miércoles",Jue:"Jueves",Vie:"Viernes",Sáb:"Sábado",Dom:"Domingo"}[dow]||dow;
+}
+function longDate(d){
+  const meses=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  const [y,m,day] = d.split("-");
+  return `${parseInt(day)} de ${meses[parseInt(m)-1]}`;
+}
+
+function notionCta(day){
+  return `<div class="notion-cta"><span>Para guardar tu avance de verdad:</span>
+    <a href="${day.url}" target="_blank" rel="noopener">Marcar en Notion ✓</a></div>`;
+}
+
+function renderToday(){
+  const card = document.getElementById("todayCard");
+  let day = DAYS.find(x=>x.d===TODAY);
+  let label = "Hoy";
+  if(!day){
+    if(TODAY < DAYS[0].d){ day = DAYS[0]; label = "La Fase 1 empieza el " + longDate(DAYS[0].d); }
+    else { day = DAYS[DAYS.length-1]; label = "Ya completaste la Fase 1 🎉 — último día:"; }
+  }
+  card.innerHTML = `
+    <span class="badge ${day.t==="D"?"rest":""}">${day.t==="D"?"Descanso":"Semana "+day.wk}</span>
+    <h2>${label==="Hoy" ? weekdayLong(day.dow)+", "+longDate(day.d) : label}</h2>
+    <div class="sub">${day.t==="D" ? "Día de descanso" : "Práctica de 30–60 min"}</div>
+    <div id="todayTasks"></div>
+    <div class="progress-bar" id="todayBar"><div></div></div>
+    <div class="progress-label">0/${day.tasks.length} completado (guía visual)</div>
+    ${notionCta(day)}
+  `;
+  const tasksEl = document.getElementById("todayTasks");
+  tasksEl.dataset.progressTarget = "todayBar";
+  renderTasks(day, tasksEl);
+}
+
+function selectDay(date){
+  document.querySelectorAll(".day-btn").forEach(b=>b.classList.toggle("selected", b.dataset.date===date));
+  const day = DAYS.find(x=>x.d===date);
+  const detail = document.getElementById("detail");
+  detail.classList.add("open");
+  detail.innerHTML = `
+    <div class="dtitle">${weekdayLong(day.dow)} ${parseInt(day.d.split("-")[2])} — Semana ${day.wk}</div>
+    <div class="dsub">${day.t==="D" ? "Día de descanso" : "Práctica de 30–60 min"}</div>
+    <div id="detailTasks"></div>
+    <div class="progress-bar" id="detailBar"><div></div></div>
+    <div class="progress-label" id="detailBar-label">0/${day.tasks.length} completado (guía visual)</div>
+    ${notionCta(day)}
+  `;
+  const tasksEl = document.getElementById("detailTasks");
+  tasksEl.dataset.progressTarget = "detailBar";
+  renderTasks(day, tasksEl);
+  updateProgress(day, "detailBar");
+  detail.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+
+renderToday();
+renderCalendar();
+</script>
+
+</body>
+</html>
