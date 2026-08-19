@@ -90,6 +90,12 @@
   .piece-card .sheet-note{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:6px;}
   .piece-card .sheet-link{display:inline-block;font-size:12.5px;color:var(--accent);
     font-weight:700;text-decoration:none;}
+  .piece-card .sheet-thumb{display:block;width:100%;border-radius:8px;margin:2px 0 8px;
+    background:#fff;padding:6px;box-sizing:border-box;}
+  .piece-card .pdf-wrap{display:none;width:100%;height:420px;border-radius:10px;
+    overflow:hidden;background:#fff;margin:8px 0;}
+  .piece-card .pdf-wrap.open{display:block;}
+  .piece-card .pdf-wrap iframe{width:100%;height:100%;border:0;}
 
   .notion-cta{display:flex;align-items:center;justify-content:space-between;gap:10px;
     background:#0003;border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-top:12px;}
@@ -1045,29 +1051,29 @@ function findExample(text){
 const REPERTOIRE = [
   { key:"minuet", match:/minuet en sol mayor/i, title:"Minuet en Sol mayor, BWV Anh. 114 (Bach/Petzold)",
     videoId:"7q0GnbMCd_8",
-    sheet:{ note:"Es de dominio público (obra barroca) — puedes descargar la partitura gratis.",
-      url:"https://imslp.org/index.php?title=Special:Search&search=Minuet+in+G+major+BWV+Anh+114+Petzold",
-      label:"Buscar partitura gratis en IMSLP →" } },
+    sheet:{ note:"Es de dominio público (Cuaderno de Anna Magdalena Bach) — partitura completa gratis vía Mutopia Project.",
+      thumb:"https://www.mutopiaproject.org/ftp/BachJS/BWVAnh114/anna-magdalena-04/anna-magdalena-04-preview.svg",
+      pdfUrl:"https://www.mutopiaproject.org/ftp/BachJS/BWVAnh114/anna-magdalena-04/anna-magdalena-04-a4.pdf" } },
   { key:"marcha", match:/marcha/i, title:"Marcha en Re mayor, BWV Anh. 122 (Bach)",
     videoId:"ijsEm_pJDFw",
-    sheet:{ note:"Es de dominio público (Cuaderno de Anna Magdalena Bach) — puedes descargar la partitura gratis.",
+    sheet:{ note:"Es de dominio público (Cuaderno de Anna Magdalena Bach), pero no encontré un PDF verificado para incrustar — puedes buscarla en IMSLP.",
       url:"https://imslp.org/index.php?title=Special:Search&search=March+in+D+major+BWV+Anh+122",
       label:"Buscar partitura gratis en IMSLP →" } },
   { key:"musette", match:/musette en re mayor/i, title:"Musette en Re mayor, BWV Anh. 126 (Bach)",
     videoId:"FdFqy8FDSE4",
-    sheet:{ note:"Es de dominio público (Cuaderno de Anna Magdalena Bach) — puedes descargar la partitura gratis.",
-      url:"https://imslp.org/index.php?title=Special:Search&search=Musette+in+D+major+BWV+Anh+126",
-      label:"Buscar partitura gratis en IMSLP →" } },
+    sheet:{ note:"Es de dominio público (Cuaderno de Anna Magdalena Bach) — partitura completa gratis vía Mutopia Project.",
+      thumb:"https://www.mutopiaproject.org/ftp/BachJS/BWVAnh126/anna-magdalena-22/anna-magdalena-22-preview.png",
+      pdfUrl:"https://www.mutopiaproject.org/ftp/BachJS/BWVAnh126/anna-magdalena-22/anna-magdalena-22-a4.pdf" } },
   { key:"preludio", match:/peque[ñn]o preludio/i, title:"Pequeño Preludio en Do mayor, BWV 939 (Bach)",
     videoId:"AglcCApnFBg",
-    sheet:{ note:"Es de dominio público (Doce Pequeños Preludios) — puedes descargar la partitura gratis.",
-      url:"https://imslp.org/index.php?title=Special:Search&search=Little+Prelude+in+C+major+BWV+939",
-      label:"Buscar partitura gratis en IMSLP →" } },
+    sheet:{ note:"Es de dominio público (Doce Pequeños Preludios) — partitura completa gratis vía Mutopia Project.",
+      thumb:"https://www.mutopiaproject.org/ftp/BachJS/BWV939/bwv-939/bwv-939-preview.png",
+      pdfUrl:"https://www.mutopiaproject.org/ftp/BachJS/BWV939/bwv-939/bwv-939-a4.pdf" } },
   { key:"polonesa", match:/polonesa en sol menor/i, title:"Polonesa en Sol menor, BWV Anh. 119 (Bach)",
     videoId:"E02jCmKk3L0",
-    sheet:{ note:"Es de dominio público (Cuaderno de Anna Magdalena Bach) — puedes descargar la partitura gratis.",
-      url:"https://imslp.org/index.php?title=Special:Search&search=Polonaise+in+G+minor+BWV+Anh+119",
-      label:"Buscar partitura gratis en IMSLP →" } },
+    sheet:{ note:"Es de dominio público (Cuaderno de Anna Magdalena Bach) — partitura completa gratis vía Mutopia Project.",
+      thumb:"https://www.mutopiaproject.org/ftp/BachJS/BWVAnh119/BWV-119/BWV-119-preview.png",
+      pdfUrl:"https://www.mutopiaproject.org/ftp/BachJS/BWVAnh119/BWV-119/BWV-119-a4.pdf" } },
   { key:"letitbe", match:/let it be|canci[oó]n de rock/i, title:"Let It Be — The Beatles",
     videoId:"9co96nkM5to",
     sheet:{ note:"Partitura con derechos de autor vigentes — compra la versión oficial si la necesitas en papel.",
@@ -1085,16 +1091,36 @@ function findRepertoire(day){
 function renderRepertoire(day){
   const pieces = findRepertoire(day);
   if(!pieces.length) return "";
-  return pieces.map(p => `
+  return pieces.map(p => {
+    const safeTitle = p.title.replace(/"/g,"");
+    const pdfId = "pdf_" + p.key;
+    const sheetBlock = p.sheet.pdfUrl ? `
+      <div class="sheet-note">🎼 ${p.sheet.note}</div>
+      ${p.sheet.thumb ? `<img class="sheet-thumb" src="${p.sheet.thumb}" alt="Vista previa de la partitura de ${safeTitle}" loading="lazy">` : ""}
+      <button type="button" class="example-toggle pdf-toggle" data-target="${pdfId}">📄 Ver partitura completa</button>
+      <div class="pdf-wrap" id="${pdfId}"><iframe src="${p.sheet.pdfUrl}" title="Partitura de ${safeTitle}" loading="lazy"></iframe></div>
+      <a class="sheet-link" href="${p.sheet.pdfUrl}" target="_blank" rel="noopener">Abrir PDF en pestaña nueva →</a>` : `
+      <div class="sheet-note">🎼 ${p.sheet.note}</div>
+      <a class="sheet-link" href="${p.sheet.url}" target="_blank" rel="noopener">${p.sheet.label}</a>`;
+    return `
     <div class="piece-card">
       <div class="ptitle">🎵 ${p.title}</div>
       <div class="video-wrap"><iframe src="https://www.youtube-nocookie.com/embed/${p.videoId}"
-        title="${p.title.replace(/"/g,"")}" loading="lazy"
+        title="${safeTitle}" loading="lazy"
         allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen></iframe></div>
-      <div class="sheet-note">🎼 ${p.sheet.note}</div>
-      <a class="sheet-link" href="${p.sheet.url}" target="_blank" rel="noopener">${p.sheet.label}</a>
-    </div>`).join("");
+      ${sheetBlock}
+    </div>`;
+  }).join("");
+}
+function wirePdfToggles(container){
+  container.querySelectorAll(".pdf-toggle").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const box = document.getElementById(btn.dataset.target);
+      const isOpen = box.classList.toggle("open");
+      btn.textContent = isOpen ? "▲ Ocultar partitura" : "📄 Ver partitura completa";
+    });
+  });
 }
 
 function todayStr(){
@@ -1215,6 +1241,7 @@ function renderToday(){
   const tasksEl = document.getElementById("todayTasks");
   tasksEl.dataset.progressTarget = "todayBar";
   renderTasks(day, tasksEl);
+  wirePdfToggles(card);
 }
 
 function selectDay(date){
@@ -1234,6 +1261,7 @@ function selectDay(date){
   const tasksEl = document.getElementById("detailTasks");
   tasksEl.dataset.progressTarget = "detailBar";
   renderTasks(day, tasksEl);
+  wirePdfToggles(detail);
   updateProgress(day, "detailBar");
   detail.scrollIntoView({behavior:"smooth", block:"nearest"});
 }
