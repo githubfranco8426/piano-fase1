@@ -205,6 +205,50 @@
   .bottom-nav button{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;
     color:var(--muted);font-family:'JetBrains Mono';font-size:10.5px;cursor:pointer;padding:2px 10px;}
   .bottom-nav button.active{color:var(--primary-soft);}
+
+  .notify-toggle{display:inline-flex;align-items:center;gap:7px;background:var(--card3);
+    border:1px solid var(--border2);color:var(--muted);font-family:'JetBrains Mono';font-size:11.5px;
+    padding:8px 14px;border-radius:100px;cursor:pointer;margin:0 0 14px;}
+  .notify-toggle .material-symbols-outlined{font-size:16px;}
+  .notify-toggle.on{color:var(--primary-soft);border-color:rgba(91,140,255,.4);background:#5b8cff1a;}
+
+  .completion-banner{margin-top:14px;padding:14px 16px;border-radius:14px;
+    background:linear-gradient(135deg,#5b8cff26,#5b8cff0d);border:1px solid rgba(91,140,255,.35);
+    font-size:13px;line-height:1.55;color:var(--text);}
+  .completion-banner b{color:var(--primary-soft);}
+  .completion-banner .new-badges{margin-top:6px;font-family:'JetBrains Mono';font-size:11px;color:var(--primary-soft);}
+
+  .tip-banner{margin-top:12px;padding:11px 14px;border-radius:12px;background:var(--card2);
+    border-left:3px solid var(--tertiary);font-size:12.5px;line-height:1.5;color:var(--muted);}
+  .tip-banner b{color:var(--text);}
+
+  .stat-row{display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+  .stat-pill{flex:1;min-width:130px;background:var(--card3);border:1px solid var(--border2);
+    border-radius:16px;padding:14px 16px;}
+  .stat-pill .n{display:block;font-family:'Manrope';font-weight:700;font-size:28px;color:#fff;}
+  .stat-pill .l{display:block;font-family:'JetBrains Mono';font-size:10.5px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+
+  .badge-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:6px;}
+  .badge-card{background:var(--card3);border:1px solid var(--border2);border-radius:16px;
+    padding:16px 12px;text-align:center;}
+  .badge-card img{width:64px;height:64px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;}
+  .badge-card.locked img{filter:grayscale(1);opacity:.35;}
+  .badge-card .bname{font-family:'Manrope';font-weight:700;font-size:12.5px;color:var(--text);}
+  .badge-card.locked .bname{color:var(--muted);}
+  .badge-card .bdesc{font-family:'JetBrains Mono';font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4;}
+
+  .session-list{display:flex;flex-direction:column;gap:2px;}
+  .session-row{display:flex;justify-content:space-between;align-items:center;padding:11px 4px;
+    border-top:1px solid var(--border2);font-size:13px;}
+  .session-row:first-child{border-top:none;}
+  .session-row .sd{font-family:'Manrope';font-weight:600;}
+  .session-row .sw{font-family:'JetBrains Mono';font-size:11px;color:var(--muted);}
+  .session-empty{color:var(--muted);font-size:13px;padding:8px 4px;}
+
+  .metro-suggest{font-family:'JetBrains Mono';font-size:11.5px;color:var(--primary-soft);
+    background:#5b8cff1a;border:1px solid rgba(91,140,255,.3);padding:8px 14px;border-radius:100px;
+    text-align:center;}
 </style>
 </head>
 <body>
@@ -216,6 +260,7 @@
   <a href="#" data-view="fundamentos"><span class="material-symbols-outlined">library_music</span> Fundamentos</a>
   <a href="#" data-view="calendario"><span class="material-symbols-outlined">calendar_month</span> Calendario</a>
   <a href="#" data-view="metronomo"><span class="material-symbols-outlined">graphic_eq</span> Metrónomo</a>
+  <a href="#" data-view="historial"><span class="material-symbols-outlined">military_tech</span> Historial</a>
 </nav>
 
 <div class="main-col">
@@ -225,6 +270,10 @@
 
   <section class="view active" id="view-practica">
     <div class="view-head"><p>2 sep – 28 dic 2026 · 1 sesión en cada saliente · Fundamentos</p></div>
+    <button class="notify-toggle" id="notifyToggle" type="button">
+      <span class="material-symbols-outlined">notifications</span>
+      <span id="notifyToggleLabel">Avisarme al abrir la app</span>
+    </button>
     <div class="today-card" id="todayCard"></div>
     <div class="notion-box">
       Los checks que marcas acá se guardan solos en este dispositivo (no se pierden al recargar). Si además quieres
@@ -256,6 +305,7 @@
           <span class="bpm-label">BPM</span>
         </div>
       </div>
+      <div class="metro-suggest" id="metroSuggestNote" style="display:none;"></div>
       <div class="metro-controls">
         <button class="metro-round" id="metroMinus" aria-label="Bajar tempo"><span class="material-symbols-outlined">remove</span></button>
         <button class="metro-play" id="metroPlay" aria-label="Iniciar metrónomo"><span class="material-symbols-outlined icon-fill">play_arrow</span></button>
@@ -275,6 +325,15 @@
     </div>
   </section>
 
+  <section class="view" id="view-historial">
+    <div class="view-head"><h2>Historial</h2><p>Tu racha, tus logros y las sesiones completadas</p></div>
+    <div class="stat-row" id="statRow"></div>
+    <div class="section-title">Logros</div>
+    <div class="badge-grid" id="badgeGrid"></div>
+    <div class="section-title">Sesiones completadas</div>
+    <div class="session-list" id="sessionList"></div>
+  </section>
+
   <footer>Fase 1 · Franco · generado a partir de tu notebook de piano</footer>
 </div>
 </div>
@@ -284,6 +343,7 @@
   <button data-view="fundamentos"><span class="material-symbols-outlined">library_music</span>Fundamentos</button>
   <button data-view="calendario"><span class="material-symbols-outlined">calendar_month</span>Calendario</button>
   <button data-view="metronomo"><span class="material-symbols-outlined">graphic_eq</span>Metrónomo</button>
+  <button data-view="historial"><span class="material-symbols-outlined">military_tech</span>Historial</button>
 </nav>
 
 <script>
@@ -2202,6 +2262,76 @@ function saveCheckState(){
 }
 const checkState = loadCheckState(); // se guarda solo en este dispositivo/navegador; Notion sigue siendo el registro visible desde cualquier lado
 
+// --- Progreso, racha y logros (todo derivado de checkState, sin backend) ---
+function isDayComplete(day){
+  return day.tasks.length > 0 && day.tasks.every((_,idx)=>checkState[taskId(day.d,idx)]);
+}
+function activeDaysUpTo(dateStr){
+  return DAYS.filter(d=>d.t==="A" && d.d<=dateStr);
+}
+function completedActiveDays(){
+  return DAYS.filter(d=>d.t==="A" && isDayComplete(d));
+}
+function currentStreak(){
+  const active = activeDaysUpTo(TODAY);
+  let streak = 0;
+  for(let i=active.length-1;i>=0;i--){
+    if(isDayComplete(active[i])) streak++;
+    else break;
+  }
+  return streak;
+}
+function loadMetroUsed(){
+  return localStorage.getItem("pianoFase1_metroUsed_v1") === "1";
+}
+function markMetroUsed(){
+  try{ localStorage.setItem("pianoFase1_metroUsed_v1", "1"); }catch(e){}
+}
+function getBadges(){
+  const done = completedActiveDays().length;
+  const totalActive = DAYS.filter(d=>d.t==="A").length;
+  const streak = currentStreak();
+  return [
+    { key:"first_steps", img:"assets/badges/first_steps.png", name:"Primeros pasos",
+      desc:"Completa tu primera sesión", unlocked: done>=1 },
+    { key:"high_streak", img:"assets/badges/high_streak.png", name:"Racha alta",
+      desc:"3 sesiones seguidas sin cortar la racha", unlocked: streak>=3 },
+    { key:"perfect_timing", img:"assets/badges/perfect_timing.png", name:"Timing perfecto",
+      desc:"Usa el metrónomo al menos una vez", unlocked: loadMetroUsed() },
+    { key:"mastery", img:"assets/badges/mastery.png", name:"Maestría",
+      desc:`Completa las ${totalActive} sesiones de la Fase 1`, unlocked: done>=totalActive && totalActive>0 },
+  ];
+}
+function getTip(day){
+  const streak = currentStreak();
+  if(day.t === "D"){
+    if(streak>=1) return `Vienes con racha de ${streak} sesión${streak===1?"":"es"} — descansa tranquilo, sigue mañana.`;
+    return null;
+  }
+  const alreadyDone = isDayComplete(day);
+  if(alreadyDone) return null;
+  const text = day.tasks.map(t=>t[1]).join(" | ");
+  if(/\(nuevo\)/i.test(text)) return "Hay un ejercicio nuevo hoy — tócalo primero, muy lento, antes que el resto.";
+  if(streak>=3) return `🔥 Racha de ${streak} sesiones seguidas. No la cortes hoy.`;
+  if(findRepertoire(day).length) return "Antes de tocar la pieza, mira el video completo una vez para tener el sonido en el oído.";
+  return "Empieza por la Técnica — es la base para lo que sigue en la sesión.";
+}
+function renderCompletion(day, elId, wasIncompleteBefore){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  if(day.t!=="A" || !isDayComplete(day)){ el.innerHTML = ""; return; }
+  const badges = getBadges();
+  const newlyUnlocked = wasIncompleteBefore ? badges.filter(b=>b.unlocked && (b.key==="first_steps" || b.key==="high_streak" || b.key==="mastery")) : [];
+  el.innerHTML = `<div class="completion-banner">🎉 <b>¡Sesión completa!</b> Llevas ${completedActiveDays().length} sesión${completedActiveDays().length===1?"":"es"} en total, racha actual de ${currentStreak()}.
+    ${newlyUnlocked.length ? `<div class="new-badges">🏅 Nuevo logro: ${newlyUnlocked.map(b=>b.name).join(", ")} — mira Historial</div>` : ""}</div>`;
+}
+function renderTip(day, elId){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const tip = getTip(day);
+  el.innerHTML = tip ? `<div class="tip-banner">💡 ${tip}</div>` : "";
+}
+
 function fmtRange(days){
   const first = days[0].d.split("-"), last = days[days.length-1].d.split("-");
   const meses=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
@@ -2252,10 +2382,11 @@ function renderTasks(day, container){
         <div class="example-box" id="${exId}"><span class="ex-title">${ex.title}</span>${ex.html}</div>` : ""}
       </div>`;
     row.querySelector("input").addEventListener("change", (e)=>{
+      const wasComplete = isDayComplete(day);
       checkState[id] = e.target.checked;
       saveCheckState();
       row.classList.toggle("checked", e.target.checked);
-      updateProgress(day, container.dataset.progressTarget);
+      updateProgress(day, container.dataset.progressTarget, !wasComplete && isDayComplete(day));
     });
     if(ex){
       const btn = row.querySelector(".example-toggle");
@@ -2269,7 +2400,7 @@ function renderTasks(day, container){
   });
 }
 
-function updateProgress(day, barId){
+function updateProgress(day, barId, justCompleted){
   const total = day.tasks.length;
   const done = day.tasks.filter((_,idx)=>checkState[taskId(day.d,idx)]).length;
   const bar = document.getElementById(barId);
@@ -2277,6 +2408,9 @@ function updateProgress(day, barId){
     bar.querySelector("div").style.width = (total? (done/total*100):0)+"%";
     bar.nextElementSibling.textContent = done+"/"+total+" completado (guardado en este dispositivo)";
   }
+  const base = barId.replace("Bar","");
+  renderCompletion(day, base+"Completion", !!justCompleted);
+  renderTip(day, base+"Tip");
 }
 
 function weekdayLong(dow){
@@ -2308,6 +2442,8 @@ function renderToday(){
     <div id="todayTasks"></div>
     <div class="progress-bar" id="todayBar"><div></div></div>
     <div class="progress-label">0/${day.tasks.length} completado (guardado en este dispositivo)</div>
+    <div id="todayCompletion"></div>
+    <div id="todayTip"></div>
     ${notionCta(day)}
     ${renderRepertoire(day)}
   `;
@@ -2329,6 +2465,8 @@ function selectDay(date){
     <div id="detailTasks"></div>
     <div class="progress-bar" id="detailBar"><div></div></div>
     <div class="progress-label" id="detailBar-label">0/${day.tasks.length} completado (guardado en este dispositivo)</div>
+    <div id="detailCompletion"></div>
+    <div id="detailTip"></div>
     ${notionCta(day)}
     ${renderRepertoire(day)}
   `;
@@ -2340,9 +2478,36 @@ function selectDay(date){
   detail.scrollIntoView({behavior:"smooth", block:"nearest"});
 }
 
+function fmtSessionDate(day){
+  return weekdayLong(day.dow)+" "+parseInt(day.d.split("-")[2])+" de "+
+    ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"][parseInt(day.d.split("-")[1])-1];
+}
+function renderHistorial(){
+  const done = completedActiveDays();
+  const streak = currentStreak();
+  document.getElementById("statRow").innerHTML = `
+    <div class="stat-pill"><span class="n">${done.length}</span><span class="l">Sesiones completadas</span></div>
+    <div class="stat-pill"><span class="n">${streak}</span><span class="l">Racha actual</span></div>`;
+  document.getElementById("badgeGrid").innerHTML = getBadges().map(b => `
+    <div class="badge-card${b.unlocked?"":" locked"}">
+      <img src="${b.img}" alt="${b.name}" loading="lazy">
+      <div class="bname">${b.name}</div>
+      <div class="bdesc">${b.unlocked ? "Desbloqueado" : b.desc}</div>
+    </div>`).join("");
+  const list = document.getElementById("sessionList");
+  if(!done.length){
+    list.innerHTML = `<div class="session-empty">Todavía no marcas ninguna sesión como completa.</div>`;
+  } else {
+    list.innerHTML = done.slice().reverse().map(day => `
+      <div class="session-row"><span class="sd">${fmtSessionDate(day)}</span><span class="sw">Semana ${day.wk}</span></div>
+    `).join("");
+  }
+}
+
 function showView(name){
   document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active", v.id === "view-"+name));
   document.querySelectorAll("[data-view]").forEach(el=>el.classList.toggle("active", el.dataset.view===name));
+  if(name === "historial") renderHistorial();
 }
 document.querySelectorAll("[data-view]").forEach(el=>{
   el.addEventListener("click", (e)=>{
@@ -2403,6 +2568,7 @@ function metroScheduler(){
 function startMetro(){
   if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if(audioCtx.state === "suspended") audioCtx.resume();
+  markMetroUsed();
   metroPlaying = true;
   currentBeat = 0;
   nextNoteTime = audioCtx.currentTime + 0.05;
@@ -2456,10 +2622,81 @@ document.getElementById("metroTap").addEventListener("click", ()=>{
   }
 });
 
+// --- BPM sugerido según el ejercicio del día ---
+function suggestedBpm(day){
+  if(!day || day.t !== "A") return null;
+  const text = day.tasks.map(t=>t[1]).join(" | ").toLowerCase();
+  if(/hanon/.test(text) && /lento/.test(text)) return {bpm:60, why:"Hanon, lento"};
+  if(/hanon/.test(text) && /fluido/.test(text)) return {bpm:76, why:"Hanon, más fluido"};
+  if(/hanon/.test(text)) return {bpm:66, why:"Hanon"};
+  if(/escala/.test(text)) return {bpm:72, why:"escalas"};
+  if(/(marcha|musette|preludio|polonesa|minuet).*(memoria|tempo normal)/.test(text)) return {bpm:84, why:"repertorio de memoria"};
+  if(/let it be/.test(text)) return {bpm:72, why:"Let It Be"};
+  if(findRepertoire(day).length) return {bpm:66, why:"repertorio, muy lento"};
+  return null;
+}
+function applyMetroSuggestion(){
+  const day = DAYS.find(x=>x.d===TODAY);
+  const suggestion = suggestedBpm(day);
+  const note = document.getElementById("metroSuggestNote");
+  if(suggestion){
+    metroBpm = suggestion.bpm;
+    note.textContent = `Sugerido para hoy (${suggestion.why}): ${suggestion.bpm} BPM`;
+    note.style.display = "block";
+  } else {
+    note.style.display = "none";
+  }
+}
+
+// --- Recordatorios por notificación del navegador (solo mientras la app está abierta) ---
+const NOTIFY_KEY = "pianoFase1_notifyEnabled_v1";
+const NOTIFY_LAST_KEY = "pianoFase1_notifyLastDate_v1";
+let notifyEnabled = localStorage.getItem(NOTIFY_KEY) === "1";
+function updateNotifyToggleUI(){
+  const btn = document.getElementById("notifyToggle");
+  const label = document.getElementById("notifyToggleLabel");
+  btn.classList.toggle("on", notifyEnabled);
+  label.textContent = notifyEnabled ? "Aviso activado" : "Avisarme al abrir la app";
+}
+document.getElementById("notifyToggle").addEventListener("click", async ()=>{
+  if(!notifyEnabled){
+    if(!("Notification" in window)){
+      alert("Tu navegador no soporta notificaciones.");
+      return;
+    }
+    const perm = await Notification.requestPermission();
+    if(perm !== "granted"){
+      alert("No diste permiso de notificaciones — no puedo avisarte así. Sigues teniendo los recordatorios de Google Calendar.");
+      return;
+    }
+    notifyEnabled = true;
+  } else {
+    notifyEnabled = false;
+  }
+  localStorage.setItem(NOTIFY_KEY, notifyEnabled ? "1" : "0");
+  updateNotifyToggleUI();
+});
+function maybeNotify(){
+  if(!notifyEnabled) return;
+  if(!("Notification" in window) || Notification.permission !== "granted") return;
+  if(localStorage.getItem(NOTIFY_LAST_KEY) === TODAY) return; // ya avisó hoy
+  const day = DAYS.find(x=>x.d===TODAY);
+  if(!day || day.t !== "A" || isDayComplete(day)) return;
+  try{
+    new Notification("🎹 Piano — Fase 1", {
+      body: "Hoy toca practicar. Abre la app para ver la sesión de hoy.",
+    });
+    localStorage.setItem(NOTIFY_LAST_KEY, TODAY);
+  }catch(e){ /* algunos navegadores mobile bloquean Notification directa */ }
+}
+
 renderToday();
 renderCalendar();
 renderFundamentos();
+applyMetroSuggestion();
 updateMetroUI();
+updateNotifyToggleUI();
+maybeNotify();
 </script>
 
 </body>
