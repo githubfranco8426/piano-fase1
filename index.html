@@ -227,9 +227,9 @@
     <div class="view-head"><p>2 sep – 28 dic 2026 · 1 sesión en cada saliente · Fundamentos</p></div>
     <div class="today-card" id="todayCard"></div>
     <div class="notion-box">
-      Marca aquí mientras practicas, como guía visual del día. Para que el check quede guardado de verdad y lo veas
-      mañana desde el celular, tócalo también en tu página de Notion (botón "Marcar en Notion ✓" de cada día, o el
-      acceso general de abajo).
+      Los checks que marcas acá se guardan solos en este dispositivo (no se pierden al recargar). Si además quieres
+      verlos desde otro celular o computador, tócalos también en tu página de Notion (botón "Marcar en Notion ✓" de
+      cada día, o el acceso general de abajo).
       <br>
       <a class="btn" href="https://app.notion.com/p/0588af861a594e15af5c4f1fbbeda3ef" target="_blank" rel="noopener">Abrir base completa en Notion <span class="material-symbols-outlined" style="font-size:16px;">arrow_forward</span></a>
     </div>
@@ -2191,7 +2191,16 @@ function todayStr(){
   return n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0");
 }
 const TODAY = todayStr();
-const checkState = {}; // guía visual en memoria; el registro real vive en Notion
+const CHECK_STORAGE_KEY = "pianoFase1_checkState_v1";
+function loadCheckState(){
+  try{ return JSON.parse(localStorage.getItem(CHECK_STORAGE_KEY)) || {}; }
+  catch(e){ return {}; }
+}
+function saveCheckState(){
+  try{ localStorage.setItem(CHECK_STORAGE_KEY, JSON.stringify(checkState)); }
+  catch(e){ /* localStorage no disponible (modo privado, etc.) — se pierde el registro local */ }
+}
+const checkState = loadCheckState(); // se guarda solo en este dispositivo/navegador; Notion sigue siendo el registro visible desde cualquier lado
 
 function fmtRange(days){
   const first = days[0].d.split("-"), last = days[days.length-1].d.split("-");
@@ -2244,6 +2253,7 @@ function renderTasks(day, container){
       </div>`;
     row.querySelector("input").addEventListener("change", (e)=>{
       checkState[id] = e.target.checked;
+      saveCheckState();
       row.classList.toggle("checked", e.target.checked);
       updateProgress(day, container.dataset.progressTarget);
     });
@@ -2265,7 +2275,7 @@ function updateProgress(day, barId){
   const bar = document.getElementById(barId);
   if(bar){
     bar.querySelector("div").style.width = (total? (done/total*100):0)+"%";
-    bar.nextElementSibling.textContent = done+"/"+total+" completado (guía visual)";
+    bar.nextElementSibling.textContent = done+"/"+total+" completado (guardado en este dispositivo)";
   }
 }
 
@@ -2297,7 +2307,7 @@ function renderToday(){
     <div class="sub">${day.t==="D" ? "Día de descanso" : "Práctica de 30–60 min"}</div>
     <div id="todayTasks"></div>
     <div class="progress-bar" id="todayBar"><div></div></div>
-    <div class="progress-label">0/${day.tasks.length} completado (guía visual)</div>
+    <div class="progress-label">0/${day.tasks.length} completado (guardado en este dispositivo)</div>
     ${notionCta(day)}
     ${renderRepertoire(day)}
   `;
@@ -2305,6 +2315,7 @@ function renderToday(){
   tasksEl.dataset.progressTarget = "todayBar";
   renderTasks(day, tasksEl);
   wirePdfToggles(card);
+  updateProgress(day, "todayBar");
 }
 
 function selectDay(date){
@@ -2317,7 +2328,7 @@ function selectDay(date){
     <div class="dsub">${day.t==="D" ? "Día de descanso" : "Práctica de 30–60 min"}</div>
     <div id="detailTasks"></div>
     <div class="progress-bar" id="detailBar"><div></div></div>
-    <div class="progress-label" id="detailBar-label">0/${day.tasks.length} completado (guía visual)</div>
+    <div class="progress-label" id="detailBar-label">0/${day.tasks.length} completado (guardado en este dispositivo)</div>
     ${notionCta(day)}
     ${renderRepertoire(day)}
   `;
