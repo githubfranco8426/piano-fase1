@@ -4,91 +4,130 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Piano — Fase 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0f1115;
+    --bg:#111317;
     --card:#171a21;
-    --card2:#1e222b;
-    --text:#eef0f4;
-    --muted:#9aa2b1;
-    --accent:#5b8cff;
-    --accent2:#7fd8a0;
-    --rest:#6b7280;
-    --today-ring:#ffcc66;
-    --border:#262b36;
+    --card2:#1a1c20;
+    --card3:#1e2024;
+    --card-high:#282a2e;
+    --text:#e2e2e8;
+    --muted:#c3c6d6;
+    --primary:#5b8cff;
+    --primary-soft:#b2c5ff;
+    --tertiary:#bfc7d6;
+    --border:rgba(154,162,177,.14);
+    --border2:rgba(154,162,177,.08);
     --notion:#eef0f4;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    -webkit-tap-highlight-color:transparent;}
-  body{padding-bottom:60px;}
-  header{padding:22px 18px 14px;position:sticky;top:0;background:linear-gradient(180deg,var(--bg) 80%,transparent);z-index:5;}
-  header h1{margin:0 0 4px;font-size:22px;letter-spacing:.2px;}
-  header p{margin:0;color:var(--muted);font-size:13.5px;}
-  .wrap{padding:0 14px;max-width:640px;margin:0 auto;}
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;}
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:22px;vertical-align:middle;}
+  .icon-fill{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;}
 
-  .today-card{background:linear-gradient(145deg,var(--card2),var(--card));
-    border:1px solid var(--border);border-radius:18px;padding:16px 16px 14px;margin:14px 0 18px;
-    box-shadow:0 6px 24px rgba(0,0,0,.25);}
-  .today-card .badge{display:inline-block;background:var(--accent);color:#0b0e14;font-weight:700;
-    font-size:11.5px;padding:3px 9px;border-radius:100px;margin-bottom:8px;}
-  .today-card .badge.rest{background:var(--rest);color:#fff;}
-  .today-card h2{margin:0 0 2px;font-size:19px;}
-  .today-card .sub{color:var(--muted);font-size:13px;margin-bottom:10px;}
-  .progress-bar{height:6px;background:#0006;border-radius:100px;overflow:hidden;margin:10px 0 4px;}
-  .progress-bar > div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width .25s;}
-  .progress-label{font-size:11.5px;color:var(--muted);text-align:right;}
+  body{padding-bottom:76px;}
+  .app{max-width:960px;margin:0 auto;display:flex;align-items:flex-start;}
 
-  .section-title{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
-    margin:22px 2px 8px;font-weight:700;}
+  .side-nav{display:none;}
+  @media(min-width:860px){
+    body{padding-bottom:0;}
+    .app{max-width:1100px;}
+    .side-nav{display:flex;flex-direction:column;width:230px;flex:0 0 230px;padding:26px 12px;
+      background:var(--card3);min-height:100vh;position:sticky;top:0;align-self:flex-start;}
+    .side-nav .brand{display:flex;align-items:center;gap:9px;padding:0 12px 26px;font-family:'Manrope';
+      font-weight:700;font-size:17px;color:var(--primary-soft);}
+    .side-nav a{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:var(--muted);
+      text-decoration:none;font-size:14px;font-weight:600;margin-bottom:2px;transition:background .15s,color .15s;}
+    .side-nav a.active{background:#5b8cff26;color:var(--primary-soft);}
+    .side-nav a:hover{background:#ffffff0a;}
+    .bottom-nav{display:none;}
+    .main-col{flex:1;min-width:0;padding:34px 40px 40px;}
+    .mobile-topbar{display:none;}
+  }
+  .main-col{padding:0 16px;max-width:640px;margin:0 auto;width:100%;}
 
-  .week{margin-bottom:14px;}
-  .week-head{display:flex;justify-content:space-between;align-items:baseline;padding:0 2px 6px;}
-  .week-head .name{font-weight:700;font-size:14px;}
-  .week-head .range{font-size:11.5px;color:var(--muted);}
+  .mobile-topbar{display:flex;align-items:center;gap:9px;
+    padding:20px 16px 12px;position:sticky;top:0;background:linear-gradient(180deg,var(--bg) 78%,transparent);z-index:5;}
+  .mobile-topbar h1{margin:0;font-size:19px;font-family:'Manrope';display:flex;align-items:center;gap:8px;}
+  .mobile-topbar .material-symbols-outlined{color:var(--primary-soft);}
+
+  .view{display:none;padding-top:6px;}
+  .view.active{display:block;}
+  .view-head{margin:2px 2px 16px;}
+  .view-head h2{margin:0 0 4px;font-size:21px;font-family:'Manrope';}
+  .view-head p{margin:0;color:var(--muted);font-size:13.5px;}
+
+  .today-card{background:linear-gradient(150deg,#1c2028,#14161b);
+    border:1px solid var(--border2);border-radius:20px;padding:20px 20px 18px;margin:2px 0 18px;
+    box-shadow:0 10px 30px rgba(0,0,0,.3);}
+  .today-card .badge{display:inline-block;background:var(--card-high);color:var(--muted);font-weight:600;
+    font-family:'JetBrains Mono';letter-spacing:.03em;font-size:11px;padding:5px 12px;border-radius:100px;
+    margin-bottom:10px;text-transform:uppercase;}
+  .today-card .badge.rest{color:var(--tertiary);}
+  .today-card h2{margin:0 0 3px;font-size:20px;font-family:'Manrope';font-weight:700;}
+  .today-card .sub{color:var(--muted);font-size:13.5px;margin-bottom:14px;}
+  .progress-bar{height:8px;background:var(--card-high);border-radius:100px;overflow:hidden;margin:14px 0 6px;}
+  .progress-bar > div{height:100%;background:var(--primary);border-radius:100px;width:0%;transition:width .3s;}
+  .progress-label{font-size:11.5px;color:var(--muted);text-align:right;font-family:'JetBrains Mono';}
+
+  .section-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);
+    font-family:'JetBrains Mono';margin:26px 2px 10px;font-weight:600;border-bottom:1px solid var(--border2);padding-bottom:8px;}
+
+  .week{margin-bottom:16px;}
+  .week-head{display:flex;justify-content:space-between;align-items:baseline;padding:0 2px 8px;}
+  .week-head .name{font-weight:700;font-size:14px;font-family:'Manrope';}
+  .week-head .range{font-size:11.5px;color:var(--muted);font-family:'JetBrains Mono';}
   .days-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-  .day-btn{background:var(--card);border:1px solid var(--border);border-radius:12px;
-    padding:8px 2px 7px;text-align:center;cursor:pointer;position:relative;}
-  .day-btn .dow{display:block;font-size:9.5px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;}
-  .day-btn .num{display:block;font-size:15px;font-weight:700;}
-  .day-btn .dot{display:block;width:5px;height:5px;border-radius:50%;margin:4px auto 0;background:var(--accent);}
-  .day-btn.rest .dot{background:var(--rest);}
-  .day-btn.past{opacity:.55;}
-  .day-btn.selected{border-color:var(--accent);background:#5b8cff22;}
-  .day-btn.today{box-shadow:0 0 0 2px var(--today-ring);}
+  .day-btn{background:var(--card-high);border:1px solid transparent;border-radius:14px;
+    padding:9px 2px 8px;text-align:center;cursor:pointer;position:relative;transition:background .15s;}
+  .day-btn:hover{background:#333539;}
+  .day-btn .dow{display:block;font-size:9.5px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;font-family:'JetBrains Mono';}
+  .day-btn .num{display:block;font-size:15px;font-weight:700;font-family:'Manrope';}
+  .day-btn .dot{display:block;width:5px;height:5px;border-radius:50%;margin:5px auto 0;background:var(--primary);
+    box-shadow:0 0 6px rgba(91,140,255,.5);}
+  .day-btn.rest{background:var(--card2);opacity:.65;}
+  .day-btn.rest .dot{background:#4a4d54;box-shadow:none;}
+  .day-btn.past{opacity:.5;}
+  .day-btn.selected{border-color:var(--primary-soft);background:#5b8cff22;}
+  .day-btn.today{box-shadow:0 0 0 2px var(--primary-soft),0 0 14px rgba(178,197,255,.35);}
 
-  .detail{background:var(--card);border:1px solid var(--border);border-radius:16px;
-    padding:16px;margin-top:14px;display:none;}
+  .detail{background:var(--card3);border:1px solid var(--border2);border-radius:18px;
+    padding:18px;margin-top:16px;display:none;}
   .detail.open{display:block;}
-  .detail .dtitle{font-size:16px;font-weight:700;margin-bottom:2px;}
-  .detail .dsub{font-size:12.5px;color:var(--muted);margin-bottom:12px;}
-  .task{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-top:1px solid var(--border);}
+  .detail .dtitle{font-size:17px;font-weight:700;font-family:'Manrope';margin-bottom:2px;}
+  .detail .dsub{font-size:12.5px;color:var(--muted);margin-bottom:14px;}
+  .task{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-top:1px solid var(--border2);}
   .task:first-of-type{border-top:none;}
-  .task input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent);flex:0 0 auto;}
-  .task label{font-size:14px;line-height:1.4;}
+  .task input{margin-top:3px;width:19px;height:19px;accent-color:var(--primary);flex:0 0 auto;}
+  .task label{font-size:14px;line-height:1.45;}
   .task.checked label{color:var(--muted);text-decoration:line-through;}
-  .tag{display:inline-block;font-size:10.5px;font-weight:700;color:var(--accent);
-    text-transform:uppercase;letter-spacing:.04em;margin-right:6px;}
+  .tag{display:inline-block;font-size:10px;font-weight:700;color:var(--primary-soft);font-family:'JetBrains Mono';
+    text-transform:uppercase;letter-spacing:.05em;margin-right:7px;}
 
-  .example-toggle{display:inline-block;margin:4px 0 0;font-size:11.5px;color:var(--accent);
+  .example-toggle{display:inline-block;margin:5px 0 0;font-size:11.5px;color:var(--primary-soft);
     background:none;border:none;cursor:pointer;padding:0;font-weight:600;text-decoration:underline;
     text-underline-offset:2px;}
-  .example-box{display:none;margin:7px 0 2px;padding:10px 12px;background:var(--card2);
-    border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;
-    font-size:12.5px;line-height:1.55;color:var(--text);}
+  .example-box{display:none;margin:8px 0 2px;padding:12px 14px;background:var(--card2);
+    border:1px solid var(--border2);border-left:3px solid var(--primary);border-radius:10px;
+    font-size:12.5px;line-height:1.6;color:var(--text);}
   .example-box.open{display:block;}
-  .example-box .ex-title{font-weight:700;color:var(--accent2);margin-bottom:4px;display:block;
-    font-size:11px;text-transform:uppercase;letter-spacing:.03em;}
+  .example-box .ex-title{font-weight:700;color:var(--primary-soft);margin-bottom:5px;display:block;
+    font-size:11px;text-transform:uppercase;letter-spacing:.03em;font-family:'JetBrains Mono';}
 
-  .piece-card{background:var(--card2);border:1px solid var(--border);border-radius:14px;
-    padding:13px 14px;margin-top:12px;}
-  .piece-card .ptitle{font-weight:700;font-size:13.5px;margin-bottom:9px;}
-  .piece-card .video-wrap{position:relative;padding-top:56.25%;border-radius:10px;
+  .piece-card{background:var(--card2);border:1px solid var(--border2);border-radius:16px;
+    padding:15px 16px;margin-top:14px;}
+  .piece-card .ptitle{font-weight:700;font-size:14px;margin-bottom:10px;font-family:'Manrope';}
+  .piece-card .video-wrap{position:relative;padding-top:56.25%;border-radius:12px;
     overflow:hidden;background:#000;margin-bottom:10px;}
   .piece-card .video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
   .piece-card .sheet-note{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:6px;}
-  .piece-card .sheet-link{display:inline-block;font-size:12.5px;color:var(--accent);
+  .piece-card .sheet-link{display:inline-block;font-size:12.5px;color:var(--primary-soft);
     font-weight:700;text-decoration:none;}
   .piece-card .sheet-thumb{display:block;width:100%;border-radius:8px;margin:2px 0 8px;
     background:#fff;padding:6px;box-sizing:border-box;}
@@ -98,47 +137,154 @@
   .piece-card .pdf-wrap iframe{width:100%;height:100%;border:0;}
 
   .notion-cta{display:flex;align-items:center;justify-content:space-between;gap:10px;
-    background:#0003;border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-top:12px;}
+    background:rgba(0,0,0,.25);border:1px solid var(--border2);border-radius:14px;padding:12px 14px;margin-top:14px;}
   .notion-cta span{font-size:12.5px;color:var(--muted);}
   .notion-cta a{flex:0 0 auto;background:var(--notion);color:#0b0e14;font-weight:700;
-    text-decoration:none;padding:8px 13px;border-radius:100px;font-size:12.5px;white-space:nowrap;}
+    text-decoration:none;padding:9px 15px;border-radius:100px;font-size:12.5px;white-space:nowrap;}
 
-  .notion-box{background:var(--card2);border:1px dashed var(--border);border-radius:14px;
-    padding:13px 14px;margin:20px 0;font-size:13px;color:var(--muted);line-height:1.5;}
-  .notion-box a.btn{display:inline-block;margin-top:9px;background:var(--accent);color:#0b0e14;
-    font-weight:700;text-decoration:none;padding:9px 14px;border-radius:100px;font-size:13px;}
+  .notion-box{background:var(--card3);border:1px solid var(--border2);border-radius:16px;
+    padding:16px;margin:16px 0 4px;font-size:13px;color:var(--muted);line-height:1.55;}
+  .notion-box a.btn{display:inline-flex;align-items:center;gap:6px;margin-top:11px;background:var(--primary);
+    color:#0b1220;font-weight:700;text-decoration:none;padding:10px 16px;border-radius:100px;font-size:13px;
+    box-shadow:0 0 15px rgba(91,140,255,.3);}
 
-  footer{text-align:center;color:var(--muted);font-size:11.5px;padding:20px 14px 6px;}
+  .concept-grid{display:flex;flex-direction:column;gap:10px;}
+  .concept-card{background:var(--card3);border:1px solid var(--border2);border-radius:16px;padding:15px 16px;}
+  .concept-card summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;
+    font-family:'Manrope';font-weight:700;font-size:14.5px;}
+  .concept-card summary::-webkit-details-marker{display:none;}
+  .concept-card summary .material-symbols-outlined{color:var(--primary-soft);flex:0 0 auto;}
+  .concept-card summary::after{content:'expand_more';font-family:'Material Symbols Outlined';margin-left:auto;color:var(--muted);}
+  .concept-card[open] summary::after{content:'expand_less';}
+  .concept-card .body{margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);
+    font-size:13px;line-height:1.6;color:var(--muted);}
+  .concept-card .body b{color:var(--text);}
+
+  .metro-wrap{display:flex;flex-direction:column;align-items:center;gap:24px;padding:16px 0 10px;}
+  .metro-dial{position:relative;width:220px;height:220px;border-radius:50%;
+    background:radial-gradient(circle at 50% 40%, #1b1e25, #101216 75%);
+    border:8px solid var(--card-high);display:flex;align-items:center;justify-content:center;
+    box-shadow:inset 0 0 24px rgba(0,0,0,.5);}
+  .metro-dial.playing{animation:metro-pulse 1s infinite;}
+  @keyframes metro-pulse{0%{box-shadow:inset 0 0 24px rgba(0,0,0,.5),0 0 0 0 rgba(91,140,255,.45);}
+    70%{box-shadow:inset 0 0 24px rgba(0,0,0,.5),0 0 0 18px rgba(91,140,255,0);}
+    100%{box-shadow:inset 0 0 24px rgba(0,0,0,.5),0 0 0 0 rgba(91,140,255,0);}}
+  .metro-dial .mark{display:block;text-align:center;font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--primary-soft);opacity:.85;margin-bottom:6px;}
+  .metro-dial .bpm{display:block;text-align:center;font-family:'Manrope';font-weight:700;font-size:56px;color:#fff;line-height:1;}
+  .metro-dial .bpm-label{display:block;text-align:center;font-family:'JetBrains Mono';font-size:11px;color:var(--muted);
+    margin-top:4px;letter-spacing:.08em;}
+  .metro-controls{display:flex;align-items:center;gap:22px;}
+  .metro-round{width:54px;height:54px;border-radius:50%;background:var(--card3);border:1px solid var(--border2);
+    display:flex;align-items:center;justify-content:center;color:var(--text);cursor:pointer;}
+  .metro-round:hover{border-color:rgba(178,197,255,.4);color:var(--primary-soft);}
+  .metro-play{width:82px;height:82px;border-radius:50%;background:var(--primary);color:#fff;border:none;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 24px rgba(91,140,255,.4);}
+  .metro-play .material-symbols-outlined{font-size:36px;}
+  .metro-session{display:flex;align-items:center;gap:14px;background:var(--card3);border:1px solid var(--border2);
+    border-radius:14px;padding:10px 18px;}
+  .metro-session .t{font-family:'Manrope';font-weight:700;font-size:19px;letter-spacing:.05em;color:#fff;}
+  .metro-session .lbl{font-family:'JetBrains Mono';font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+  .metro-session button{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;}
+  .metro-session button:hover{color:var(--primary-soft);}
+  .metro-tap{padding:13px 26px;border-radius:100px;background:var(--card3);border:1px solid rgba(91,140,255,.3);
+    color:var(--primary-soft);font-family:'Manrope';font-weight:700;font-size:13px;letter-spacing:.05em;
+    text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:8px;}
+  .metro-tap:active{background:#5b8cff1a;}
+  .metro-sig{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .metro-sig button{padding:9px 16px;border-radius:100px;font-family:'JetBrains Mono';font-size:12.5px;
+    background:var(--card3);color:var(--muted);border:1px solid var(--border2);cursor:pointer;}
+  .metro-sig button.active{background:#5b8cff26;color:var(--primary-soft);border-color:rgba(91,140,255,.5);}
+
+  footer{text-align:center;color:var(--muted);font-size:11.5px;padding:24px 14px 6px;font-family:'JetBrains Mono';}
+
+  .bottom-nav{position:fixed;bottom:0;left:0;width:100%;display:flex;justify-content:space-around;
+    align-items:center;padding:10px 8px calc(10px + env(safe-area-inset-bottom));
+    background:rgba(26,28,32,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border-top:1px solid var(--border2);z-index:20;}
+  .bottom-nav button{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;
+    color:var(--muted);font-family:'JetBrains Mono';font-size:10.5px;cursor:pointer;padding:2px 10px;}
+  .bottom-nav button.active{color:var(--primary-soft);}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="wrap">
-    <h1>🎹 Piano — Fase 1</h1>
-    <p>2 sep – 28 dic 2026 · 1 sesión en cada saliente · Fundamentos</p>
-  </div>
-</header>
+<div class="app">
+<nav class="side-nav">
+  <div class="brand"><span class="material-symbols-outlined icon-fill">piano</span> Piano — Fase 1</div>
+  <a href="#" data-view="practica" class="active"><span class="material-symbols-outlined">exercise</span> Práctica</a>
+  <a href="#" data-view="fundamentos"><span class="material-symbols-outlined">library_music</span> Fundamentos</a>
+  <a href="#" data-view="calendario"><span class="material-symbols-outlined">calendar_month</span> Calendario</a>
+  <a href="#" data-view="metronomo"><span class="material-symbols-outlined">graphic_eq</span> Metrónomo</a>
+</nav>
 
-<div class="wrap">
-
-  <div class="today-card" id="todayCard"></div>
-
-  <div class="notion-box">
-    Marca aquí mientras practicas, como guía visual del día. Para que el check quede guardado de verdad y lo veas
-    mañana desde el celular, tócalo también en tu página de Notion (botón "Marcar en Notion ✓" de cada día, o el
-    acceso general de abajo).
-    <br>
-    <a class="btn" href="https://app.notion.com/p/0588af861a594e15af5c4f1fbbeda3ef" target="_blank" rel="noopener">Abrir base completa en Notion →</a>
+<div class="main-col">
+  <div class="mobile-topbar">
+    <h1><span class="material-symbols-outlined icon-fill">piano</span> Piano — Fase 1</h1>
   </div>
 
-  <div class="section-title">Calendario — Fase 1</div>
-  <div id="calendar"></div>
+  <section class="view active" id="view-practica">
+    <div class="view-head"><p>2 sep – 28 dic 2026 · 1 sesión en cada saliente · Fundamentos</p></div>
+    <div class="today-card" id="todayCard"></div>
+    <div class="notion-box">
+      Marca aquí mientras practicas, como guía visual del día. Para que el check quede guardado de verdad y lo veas
+      mañana desde el celular, tócalo también en tu página de Notion (botón "Marcar en Notion ✓" de cada día, o el
+      acceso general de abajo).
+      <br>
+      <a class="btn" href="https://app.notion.com/p/0588af861a594e15af5c4f1fbbeda3ef" target="_blank" rel="noopener">Abrir base completa en Notion <span class="material-symbols-outlined" style="font-size:16px;">arrow_forward</span></a>
+    </div>
+  </section>
 
-  <div class="detail" id="detail"></div>
+  <section class="view" id="view-fundamentos">
+    <div class="view-head"><h2>Fundamentos</h2><p>Guía rápida de las técnicas que vas a encontrar en el plan</p></div>
+    <div class="concept-grid" id="conceptGrid"></div>
+  </section>
+
+  <section class="view" id="view-calendario">
+    <div class="view-head"><h2>Calendario</h2><p>Fase 1 completa, semana a semana</p></div>
+    <div id="calendar"></div>
+    <div class="detail" id="detail"></div>
+  </section>
+
+  <section class="view" id="view-metronomo">
+    <div class="view-head"><h2>Metrónomo</h2><p>Para calentar antes de tocar</p></div>
+    <div class="metro-wrap">
+      <div class="metro-dial" id="metroDial">
+        <div>
+          <span class="mark" id="metroMark">Andante</span>
+          <span class="bpm" id="metroBpm">90</span>
+          <span class="bpm-label">BPM</span>
+        </div>
+      </div>
+      <div class="metro-controls">
+        <button class="metro-round" id="metroMinus" aria-label="Bajar tempo"><span class="material-symbols-outlined">remove</span></button>
+        <button class="metro-play" id="metroPlay" aria-label="Iniciar metrónomo"><span class="material-symbols-outlined icon-fill">play_arrow</span></button>
+        <button class="metro-round" id="metroPlus" aria-label="Subir tempo"><span class="material-symbols-outlined">add</span></button>
+      </div>
+      <div class="metro-session">
+        <div><div class="lbl">Sesión</div><div class="t" id="metroTimer">00:00</div></div>
+        <button id="metroReset" title="Reiniciar sesión"><span class="material-symbols-outlined">restart_alt</span></button>
+      </div>
+      <button class="metro-tap" id="metroTap"><span class="material-symbols-outlined">touch_app</span> Tap Tempo</button>
+      <div class="metro-sig" id="metroSig">
+        <button data-sig="2">2/4</button>
+        <button data-sig="3">3/4</button>
+        <button data-sig="4" class="active">4/4</button>
+        <button data-sig="6">6/8</button>
+      </div>
+    </div>
+  </section>
 
   <footer>Fase 1 · Franco · generado a partir de tu notebook de piano</footer>
 </div>
+</div>
+
+<nav class="bottom-nav">
+  <button data-view="practica" class="active"><span class="material-symbols-outlined icon-fill">exercise</span>Práctica</button>
+  <button data-view="fundamentos"><span class="material-symbols-outlined">library_music</span>Fundamentos</button>
+  <button data-view="calendario"><span class="material-symbols-outlined">calendar_month</span>Calendario</button>
+  <button data-view="metronomo"><span class="material-symbols-outlined">graphic_eq</span>Metrónomo</button>
+</nav>
 
 <script>
 const DAYS = [
@@ -2031,6 +2177,15 @@ function wirePdfToggles(container){
   });
 }
 
+function renderFundamentos(){
+  const grid = document.getElementById("conceptGrid");
+  grid.innerHTML = EXAMPLES.map((ex,i)=>`
+    <details class="concept-card"${i===0?" open":""}>
+      <summary><span class="material-symbols-outlined">music_note</span>${ex.title}</summary>
+      <div class="body">${ex.html}</div>
+    </details>`).join("");
+}
+
 function todayStr(){
   const n = new Date();
   return n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0");
@@ -2174,8 +2329,126 @@ function selectDay(date){
   detail.scrollIntoView({behavior:"smooth", block:"nearest"});
 }
 
+function showView(name){
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active", v.id === "view-"+name));
+  document.querySelectorAll("[data-view]").forEach(el=>el.classList.toggle("active", el.dataset.view===name));
+}
+document.querySelectorAll("[data-view]").forEach(el=>{
+  el.addEventListener("click", (e)=>{
+    e.preventDefault();
+    showView(el.dataset.view);
+  });
+});
+
+// --- Metrónomo (Web Audio API, scheduler con lookahead) ---
+let audioCtx = null;
+let metroBpm = 90, metroSig = 4, metroPlaying = false;
+let nextNoteTime = 0, currentBeat = 0, schedulerId = null;
+let sessionSeconds = 0, sessionInterval = null;
+const METRO_LOOKAHEAD = 25, METRO_SCHEDULE_AHEAD = 0.1;
+
+function tempoName(bpm){
+  if(bpm<40) return "Grave";
+  if(bpm<60) return "Largo";
+  if(bpm<66) return "Larghetto";
+  if(bpm<76) return "Adagio";
+  if(bpm<108) return "Andante";
+  if(bpm<120) return "Moderato";
+  if(bpm<156) return "Allegro";
+  if(bpm<176) return "Vivace";
+  if(bpm<200) return "Presto";
+  return "Prestissimo";
+}
+function fmtTimer(s){
+  return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+}
+function updateMetroUI(){
+  document.getElementById("metroBpm").textContent = metroBpm;
+  document.getElementById("metroMark").textContent = tempoName(metroBpm);
+  document.getElementById("metroDial").classList.toggle("playing", metroPlaying);
+  document.getElementById("metroPlay").innerHTML = metroPlaying
+    ? '<span class="material-symbols-outlined icon-fill">pause</span>'
+    : '<span class="material-symbols-outlined icon-fill">play_arrow</span>';
+}
+function scheduleClick(beatNumber, time){
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  const accent = beatNumber % metroSig === 0;
+  osc.frequency.value = accent ? 1500 : 1000;
+  gain.gain.setValueAtTime(accent ? 0.35 : 0.2, time);
+  gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
+  osc.start(time);
+  osc.stop(time + 0.05);
+}
+function metroScheduler(){
+  while(nextNoteTime < audioCtx.currentTime + METRO_SCHEDULE_AHEAD){
+    scheduleClick(currentBeat, nextNoteTime);
+    nextNoteTime += 60 / metroBpm;
+    currentBeat++;
+  }
+  schedulerId = setTimeout(metroScheduler, METRO_LOOKAHEAD);
+}
+function startMetro(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if(audioCtx.state === "suspended") audioCtx.resume();
+  metroPlaying = true;
+  currentBeat = 0;
+  nextNoteTime = audioCtx.currentTime + 0.05;
+  metroScheduler();
+  if(!sessionInterval){
+    sessionInterval = setInterval(()=>{
+      sessionSeconds++;
+      document.getElementById("metroTimer").textContent = fmtTimer(sessionSeconds);
+    }, 1000);
+  }
+  updateMetroUI();
+}
+function stopMetro(){
+  metroPlaying = false;
+  clearTimeout(schedulerId);
+  clearInterval(sessionInterval);
+  sessionInterval = null;
+  updateMetroUI();
+}
+document.getElementById("metroPlay").addEventListener("click", ()=>{
+  metroPlaying ? stopMetro() : startMetro();
+});
+document.getElementById("metroMinus").addEventListener("click", ()=>{
+  metroBpm = Math.max(30, metroBpm - 1); updateMetroUI();
+});
+document.getElementById("metroPlus").addEventListener("click", ()=>{
+  metroBpm = Math.min(240, metroBpm + 1); updateMetroUI();
+});
+document.getElementById("metroReset").addEventListener("click", ()=>{
+  sessionSeconds = 0;
+  document.getElementById("metroTimer").textContent = "00:00";
+});
+document.querySelectorAll("#metroSig button").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll("#metroSig button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    metroSig = parseInt(btn.dataset.sig, 10);
+  });
+});
+let tapTimes = [];
+document.getElementById("metroTap").addEventListener("click", ()=>{
+  const now = performance.now();
+  tapTimes = tapTimes.filter(t => now - t < 2500);
+  tapTimes.push(now);
+  if(tapTimes.length >= 2){
+    const intervals = [];
+    for(let i=1;i<tapTimes.length;i++) intervals.push(tapTimes[i]-tapTimes[i-1]);
+    const avg = intervals.reduce((a,b)=>a+b,0) / intervals.length;
+    metroBpm = Math.round(Math.min(240, Math.max(30, 60000/avg)));
+    updateMetroUI();
+  }
+});
+
 renderToday();
 renderCalendar();
+renderFundamentos();
+updateMetroUI();
 </script>
 
 </body>
