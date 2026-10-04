@@ -2266,6 +2266,12 @@ function saveCheckState(){
   catch(e){ /* localStorage no disponible (modo privado, etc.) — se pierde el registro local */ }
 }
 const checkState = loadCheckState(); // se guarda solo en este dispositivo/navegador; Notion sigue siendo el registro visible desde cualquier lado
+const PRACTICE_DAYS=DAYS.filter(day=>day.t==='A');
+const CURSOR_KEY='pianoFase1_lessonCursor_v1';
+let lessonCursor=0;
+try{const saved=Number(localStorage.getItem(CURSOR_KEY));if(Number.isInteger(saved)&&saved>=0&&saved<PRACTICE_DAYS.length)lessonCursor=saved;}catch(e){}
+function currentLesson(){return PRACTICE_DAYS[lessonCursor];}
+function moveLesson(offset){lessonCursor=Math.max(0,Math.min(PRACTICE_DAYS.length-1,lessonCursor+offset));try{localStorage.setItem(CURSOR_KEY,String(lessonCursor));}catch(e){}renderToday();applyMetroSuggestion();updateMetroUI();}
 
 // --- Progreso, racha y logros (todo derivado de checkState, sin backend) ---
 function isDayComplete(day){
@@ -2434,16 +2440,11 @@ function notionCta(day){
 
 function renderToday(){
   const card = document.getElementById("todayCard");
-  let day = DAYS.find(x=>x.d===TODAY);
-  let label = "Hoy";
-  if(!day){
-    if(TODAY < DAYS[0].d){ day = DAYS[0]; label = "La Fase 1 empieza el " + longDate(DAYS[0].d); }
-    else { day = DAYS[DAYS.length-1]; label = "Ya completaste la Fase 1 🎉 — último día:"; }
-  }
+  const day = currentLesson();
   card.innerHTML = `
-    <span class="badge ${day.t==="D"?"rest":""}">${day.t==="D"?"Descanso":"Semana "+day.wk}</span>
-    <h2>${label==="Hoy" ? weekdayLong(day.dow)+", "+longDate(day.d) : label}</h2>
-    <div class="sub">${day.t==="D" ? "Día de descanso" : "Práctica de 30–60 min"}</div>
+    <span class="badge">Semana ${day.wk} · Sesión ${lessonCursor+1}</span>
+    <h2>${lessonCursor===0?'Empieza desde el principio':'Tu siguiente práctica'}</h2>
+    <div class="sub">Práctica de 30–60 min · Avanza a tu ritmo, sin saltos por fecha.</div>
     <div id="todayTasks"></div>
     <div class="progress-bar" id="todayBar"><div></div></div>
     <div class="progress-label">0/${day.tasks.length} completado (guardado en este dispositivo)</div>
@@ -2451,7 +2452,10 @@ function renderToday(){
     <div id="todayTip"></div>
     ${notionCta(day)}
     ${renderRepertoire(day)}
+    <div class="lesson-navigation"><button type="button" id="lessonPrevious" ${lessonCursor===0?'disabled':''}>← Sesión anterior</button><button type="button" id="lessonNext" ${lessonCursor===PRACTICE_DAYS.length-1?'disabled':''}>Siguiente sesión →</button></div>
   `;
+  document.getElementById('lessonPrevious').addEventListener('click',()=>moveLesson(-1));
+  document.getElementById('lessonNext').addEventListener('click',()=>moveLesson(1));
   const tasksEl = document.getElementById("todayTasks");
   tasksEl.dataset.progressTarget = "todayBar";
   renderTasks(day, tasksEl);
@@ -2641,12 +2645,12 @@ function suggestedBpm(day){
   return null;
 }
 function applyMetroSuggestion(){
-  const day = DAYS.find(x=>x.d===TODAY);
+  const day = currentLesson();
   const suggestion = suggestedBpm(day);
   const note = document.getElementById("metroSuggestNote");
   if(suggestion){
     metroBpm = suggestion.bpm;
-    note.textContent = `Sugerido para hoy (${suggestion.why}): ${suggestion.bpm} BPM`;
+    note.textContent = `Sugerido para esta sesión (${suggestion.why}): ${suggestion.bpm} BPM`;
     note.style.display = "block";
   } else {
     note.style.display = "none";
@@ -2685,7 +2689,7 @@ function maybeNotify(){
   if(!notifyEnabled) return;
   if(!("Notification" in window) || Notification.permission !== "granted") return;
   if(localStorage.getItem(NOTIFY_LAST_KEY) === TODAY) return; // ya avisó hoy
-  const day = DAYS.find(x=>x.d===TODAY);
+  const day = currentLesson();
   if(!day || day.t !== "A" || isDayComplete(day)) return;
   try{
     new Notification("🎹 Piano — Fase 1", {
